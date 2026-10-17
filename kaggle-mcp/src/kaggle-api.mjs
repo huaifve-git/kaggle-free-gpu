@@ -32,7 +32,7 @@ function headers(auth) {
     ...auth.header,
     'Content-Type': 'application/json',
     Accept: 'application/json',
-    'User-Agent': 'kaggle-rvc-mcp/0.1',
+    'User-Agent': 'kaggle-free-gpu-mcp/0.1',
   };
 }
 

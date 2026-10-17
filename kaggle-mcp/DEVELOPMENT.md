@@ -1,4 +1,4 @@
-# kaggle-rvc — a Kaggle MCP server for RVC work
+# kaggle-free-gpu — a Kaggle MCP server for running anything on free GPUs
 
 > **Scope:** this is the *internal* document — implementation details, Kaggle API differences,
 > wire-level traps and the live-run log. For the user-facing overview (in Simplified Chinese),
@@ -29,8 +29,10 @@ There are Kaggle MCP servers already; none of them can run RVC:
 | [dexhunter/kaggle-mcp](https://github.com/dexhunter/kaggle-mcp) · [Dishant27/kaggle-MCP](https://github.com/Dishant27/kaggle-MCP) | Competitions-only / sample-grade. |
 | [jupyter-mcp-server](https://pypi.org/project/jupyter-mcp-server/) | Excellent for a *live* Jupyter kernel, but Kaggle's API exposes no such endpoint; it needs a Jupyter URL + token you do not have for a Kaggle batch kernel. |
 
-So this server speaks the current Kaggle API directly and treats the things RVC needs as
-first-class fields.
+So this server speaks the current Kaggle API directly and treats GPU, internet and data sources as
+first-class fields — the things heavy batch workloads like RVC need. The bundled
+[`src/rvc-templates.mjs`](src/rvc-templates.mjs) is the first complete workload built on top of
+that generic surface; anything else can use `kernel_write` with its own cells.
 
 ## How it talks to Kaggle
 

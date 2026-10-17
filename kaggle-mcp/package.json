@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Kaggle MCP server for RVC workflows: create/write/run Kaggle notebooks with full kernel metadata (GPU, internet, data sources).",
+  "description": "Kaggle MCP server: run any GPU workload on Kaggle's free GPUs (notebook lifecycle, datasets, data sources); ships RVC-ready templates.",
   "bin": {
     "kaggle-rvc-mcp": "src/server.mjs"
   },

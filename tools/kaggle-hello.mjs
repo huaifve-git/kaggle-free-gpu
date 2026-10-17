@@ -150,7 +150,7 @@ async function main() {
     res = await getWithRetry(HELLO_URL, {
       Authorization: auth.header,
       Accept: 'application/json',
-      'User-Agent': 'kaggle-rvc-setup/0.1',
+      'User-Agent': 'kaggle-free-gpu-setup/0.1',
     });
   } catch (e) {
     emit({ ok: false, status: 0, error: `网络不通: ${e.name}: ${e.message}` }, 1);

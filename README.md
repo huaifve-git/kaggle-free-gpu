@@ -1,12 +1,16 @@
-# kaggle-rvc — 在 Kaggle 上训练并使用 RVC 声音模型
+# kaggle-free-gpu — 白嫖 Kaggle 免费 GPU
 
-[RVC（Retrieval-based Voice Conversion）](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)
-是一套开源的声音转换方案：给它一段干净的人声，它可以训练出一个"音色模型"，再用这个模型把别的音频换成那个音色。
+[Kaggle](https://www.kaggle.com/) 给每个账号每周约 **30 小时免费 GPU**（单次运行最长 12 小时），但官方只认 Notebook。
+**本项目把 Kaggle 的远程算力变成可编程的工具箱**：在本地生成 Notebook → 推上 Kaggle 用 GPU 跑 →
+轮询状态并把日志和产物拉回来。任何"能吃 GPU 的批处理任务"都能跑在上面，RVC 只是第一个完整场景。
 
-它原本需要一张本地显卡、一整套 Python 环境，以及不少踩坑经验。**本项目把整条流水线搬到 Kaggle 上跑**——
-用 Kaggle 免费提供的 GPU，从一段音频开始，一路产出可用的 `.pth` 模型、FAISS 检索索引，以及转换好的音频。
+仓库内置的场景是 [RVC（Retrieval-based Voice Conversion）](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)
+声音模型流水线：RVC 原本需要一张本地显卡、一整套 Python 环境，以及不少踩坑经验；这里的模板把 RVC 上游仓库里
+那些"报错不明显、但一定会让训练失败"的坑全部提前处理掉了——提供一段音频，产出 `.pth` 模型、FAISS 检索索引，
+以及转换好的音频，和本地跑 RVC 得到的完全一样，可以直接丢进 RVC WebUI 或 CLI 使用。
 
-跑完之后你得到的东西，和本地跑 RVC 得到的完全一样，可以直接丢进 RVC WebUI 或 CLI 使用。
+要跑别的任务？核心工具（Notebook 全生命周期 + 数据集管理）与场景无关，用 `kernel_write` 写你自己的代码即可，
+GPU、联网、数据源挂载都是一等公民参数。
 
 ---
 
@@ -36,27 +40,34 @@
 
 1. 在本地生成一个 Kaggle Notebook，并把代码写进去；
 2. 把它推到 Kaggle 上运行，同时**指定 GPU、开启联网、挂载数据集**；
-3. 轮询运行状态，把日志和产出的模型文件拉回本地。
+3. 轮询运行状态，把日志和产出的文件拉回本地。
 
 它注册为 DSH 的 MCP 服务器 `kaggle`，因此所有工具体现为 `mcp__kaggle__*`。
 
-除了工具本身，项目还附带两套**技能（Skill）**和一套**经过实测的 RVC 笔记本模板**——后者把 RVC 上游仓库
-里那些"报错不明显、但一定会让训练失败"的坑全部提前处理掉了。也就是说，你不需要懂 RVC 的目录结构和参数顺序，
-只要提供音频，剩下的事情模板会做完。
+这套工具本身与具体任务无关：训练、推理、批量处理、数据搬运，只要 Kaggle 容器里装得下，就能跑。
+仓库附带的内容负责让"开箱即用"成立：
+
+- **RVC 笔记本模板**（`kaggle-mcp/src/rvc-templates.mjs`）—— 把 RVC 训练 / 推理流水线做成一键填入的单元格，
+  上游仓库里那些"报错不明显、但一定会让训练失败"的坑全部提前处理掉；
+- **两套技能（Skill）** —— 训练与推理的标准流程，AI 助手可直接调用。
+
+也就是说，你不需要懂 RVC 的目录结构和参数顺序，只要提供音频，剩下的事情模板会做完。
 
 ## 它能做什么
 
 | 能力 | 说明 |
 |---|---|
-| **训练音色模型** | 上传一段人声 → 在 Kaggle GPU 上跑完整训练 → 拿回 `.pth` 模型 + FAISS 索引 |
-| **声音转换（推理）** | 用训练好的模型把任意音频换成目标音色，输出 WAV |
-| **数据集管理** | 把本地文件夹上传为 Kaggle 数据集（默认私有），供训练挂载 |
+| **任意 GPU 任务** | 用 `kernel_write` 写自己的代码（训练 / 推理 / 脚本均可），推上 Kaggle GPU 跑，产物拉回本地 |
 | **Notebook 全生命周期** | 创建 / 写入单元格 / 配置 / 推送运行 / 查状态 / 读日志 / 下载产物 |
-| **跨 Notebook 传模型** | 推理时可直接把"训练 Kernel 的输出"挂载为数据源，模型无需下载再上传 |
+| **数据集管理** | 把本地文件夹上传为 Kaggle 数据集（默认私有），供运行挂载 |
+| **跨 Notebook 传文件** | 推理时可直接把"训练 Kernel 的输出"挂载为数据源，文件无需下载再上传 |
+| **训练音色模型**（RVC 场景） | 上传一段人声 → 在 Kaggle GPU 上跑完整训练 → 拿回 `.pth` 模型 + FAISS 索引 |
+| **声音转换（推理）**（RVC 场景） | 用训练好的模型把任意音频换成目标音色，输出 WAV |
 
 ## 工作原理
 
-一次 Kaggle 运行 = 一个**全新的容器**。所以模板里的每个阶段都是自包含的，会自己把需要的东西重建出来：
+一次 Kaggle 运行 = 一个**全新的容器**。所以模板里的每个阶段都是自包含的，会自己把需要的东西重建出来。
+下图是内置的 RVC 训练流水线；换成别的任务，流程骨架完全一样（写代码 → 推 kernel → 拉产物），只是单元格内容不同：
 
 ```
         你的音频                      Kaggle GPU Kernel
@@ -76,7 +87,7 @@
                                         └────────────────────────────────┘
 ```
 
-三个可选阶段：
+内置 RVC 模板提供三个阶段：
 
 - **setup** —— 只验证环境（依赖能否装好、预训练资源能否下载）。成本低、失败快，建议第一次先跑它。
 - **train** —— 真正的训练：数据 → 模型 + 索引。
@@ -117,9 +128,9 @@ npm install
         transport: stdio
         command: "node"
         args: ["<绝对路径>/kaggle-mcp/src/server.mjs"]
-        cwd: "<绝对路径>/kaggle_rvc_2"
+        cwd: "<绝对路径>/kaggle-free-gpu"
         env:
-          KAGGLE_RVC_HOME: "<绝对路径>/kaggle_rvc_2"
+          KAGGLE_RVC_HOME: "<绝对路径>/kaggle-free-gpu"
 ```
 
 改完配置或服务器代码后**需要重启 DSH**：已经启动的子进程不会热加载新的模块与补丁。
@@ -165,6 +176,9 @@ pwsh -File setup-kaggle.ps1 -NoVerify            # 跳过在线验证（离线�
 > 注意：本地凭据文件可能含有私密 Token，请不要提交到版本库（`.gitignore` 已忽略 `.secrets/`）。
 
 ## 快速上手
+
+以下以仓库内置的 RVC 模板为例（这是开箱可用的完整场景）。要跑其他任务，可以跳过模板部分，
+直接用 `kernel_new` 创建 Kernel，再用 `kernel_write` 写入你自己的单元格。
 
 ### 第一步：确认连通性
 
@@ -275,7 +289,7 @@ kernel_output  kernel="rvc-infer-myvoice", match="converted/"
 ## 输出与目录结构
 
 ```
-kaggle_rvc_2/
+kaggle-free-gpu/
 ├── README.md                  ← 本文件（对外说明）
 ├── 一键配置Kaggle密钥.cmd      双击填密钥（Windows 一键脚本）
 ├── setup-kaggle.ps1           上面那个 .cmd 的实现：验证 + 写入 + 同步用户名
@@ -286,7 +300,7 @@ kaggle_rvc_2/
 │   └── test/                  冒烟、协议、端到端测试
 ├── kernels/<slug>/            本地生成的 Kernel（.ipynb + 元数据）
 ├── outputs/<owner>__<slug>/   从 Kaggle 下载的产物 + 运行日志
-├── skills/                    DSH 技能：训练与推理的标准流程
+├── skills/                    DSH 技能：RVC 训练与推理的标准流程
 └── .secrets/                  本地凭据兜底（Git 忽略）
 ```
 
@@ -296,9 +310,9 @@ kaggle_rvc_2/
 ## 常见问题
 
 **Q：为什么不用现成的 Kaggle MCP 服务器？**
-现有方案都跑不了 RVC：Kaggle 官方远程 MCP 需要交互式 OAuth，且保存 Notebook 时会丢数据源；
+现有方案都跑不了重 GPU 负载：Kaggle 官方远程 MCP 需要交互式 OAuth，且保存 Notebook 时会丢数据源；
 社区方案在推送 Kernel 时不支持 `enable_gpu` / `enable_internet` / `dataset_sources`——
-没有这三样，RVC 既装不了依赖，也看不到训练音频。本项目为这些字段提供了一等公民支持。
+没有这三样，GPU 任务既装不了依赖，也看不到输入数据。本项目为这些字段提供了一等公民支持。
 
 **Q：`dataset_push` 失败了？**
 它依赖把文件 PUT 到 `www.googleapis.com`（Kaggle 的 Blob 上传端点）。部分网络会屏蔽该域名，
@@ -321,8 +335,8 @@ kaggle_rvc_2/
 ## 数据与隐私
 
 训练用的音频、训练出的模型、索引和转换结果**默认不属于本仓库**，`models/`、`outputs/`、
-`kernels/rvc-train-*/`、`kernels/rvc-infer-*/` 以及 `*.pth`、`*.index`、`*.wav` 等扩展名都已在
-`.gitignore` 中忽略。
+`kernels/`（本地生成的 Kernel 元数据里含你的 Kaggle 账号名）以及 `*.pth`、`*.index`、`*.wav`
+等扩展名都已在 `.gitignore` 中忽略。
 
 如果你用的是**别人的声音素材**，请把相关文件放在本仓库目录之外（避免被误打包或误 `git add -f`），
 并且：

@@ -160,7 +160,7 @@ function Test-Credential {
     # 兜底：直接用 PowerShell 请求（需要 .NET 侧 TLS 可用）。
     try {
         [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
-        $headers = @{ Accept = 'application/json'; 'User-Agent' = 'kaggle-rvc-setup/0.1' }
+        $headers = @{ Accept = 'application/json'; 'User-Agent' = 'kaggle-free-gpu-setup/0.1' }
         if ($Key) {
             $headers.Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("${User}:${Key}"))
         } else {
