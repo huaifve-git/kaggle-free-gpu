@@ -300,7 +300,7 @@ kaggle-free-gpu/
 │   └── test/                  冒烟、协议、端到端测试
 ├── kernels/<slug>/            本地生成的 Kernel（.ipynb + 元数据）
 ├── outputs/<owner>__<slug>/   从 Kaggle 下载的产物 + 运行日志
-├── skills/                    DSH 技能：RVC 训练与推理的标准流程
+├── skills/                    DSH 技能：RVC 训练/推理 + Kaggle 公网 LLM API 部署的标准流程
 └── .secrets/                  本地凭据兜底（Git 忽略）
 ```
 
@@ -361,6 +361,7 @@ kaggle-free-gpu/
 | [kaggle-mcp/DEVELOPMENT.md](kaggle-mcp/DEVELOPMENT.md) | 服务器实现细节、Kaggle API 差异、实测踩坑记录、测试方式 |
 | [skills/rvc-train-on-kaggle/SKILL.md](skills/rvc-train-on-kaggle/SKILL.md) | 训练流程：额度检查、工具顺序、产物验证、失败排查 |
 | [skills/rvc-inference-on-kaggle/SKILL.md](skills/rvc-inference-on-kaggle/SKILL.md) | 推理流程：模型挂载方式、参数说明、常见故障 |
+| [skills/serve-llm-api-on-kaggle/SKILL.md](skills/serve-llm-api-on-kaggle/SKILL.md) | 部署流程：GGUF 选型、llama.cpp + Cloudflare 隧道暴露公网 api/v1、URL 回传与保活 |
 
 ## 致谢与许可
 

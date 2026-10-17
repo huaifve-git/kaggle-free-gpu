@@ -11,10 +11,11 @@ dataset sources**, let it run, then poll the status and pull the logs and output
 It is registered in DSH as the MCP server `kaggle`, so its tools appear as
 `mcp__kaggle__<tool>`.
 
-**Companion skills:** [`../skills/`](../skills) holds two DSH skills that pair with these
-tools — `rvc-train-on-kaggle` (dataset → model + index) and `rvc-inference-on-kaggle`
-(model → converted audio). They are registered as a custom skill root in the same profile
-patch, so an agent picks them up automatically when a request matches.
+**Companion skills:** [`../skills/`](../skills) holds DSH skills that pair with these
+tools — `rvc-train-on-kaggle` (dataset → model + index), `rvc-inference-on-kaggle`
+(model → converted audio) and `serve-llm-api-on-kaggle` (GGUF → public OpenAI-compatible
+api/v1 via llama.cpp + cloudflared). They are registered as a custom skill root in the same
+profile patch, so an agent picks them up automatically when a request matches.
 
 ---
 
