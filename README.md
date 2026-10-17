@@ -364,6 +364,7 @@ kaggle-free-gpu/
 
 ## 致谢与许可
 
+- 本项目的代码以 [MIT](LICENSE) 许可发布。
 - 声音转换能力来自 [RVC-Project/Retrieval-based-Voice-Conversion-WebUI](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)，
   本项目只负责编排与在 Kaggle 上运行它。
 - 算力由 [Kaggle](https://www.kaggle.com/) 提供。
