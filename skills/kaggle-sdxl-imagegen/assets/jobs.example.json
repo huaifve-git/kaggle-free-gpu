@@ -1,0 +1,21 @@
+{
+  "model": "stabilityai/stable-diffusion-xl-base-1.0",
+  "steps": 32,
+  "guidance": 6.0,
+  "width": 1024,
+  "height": 1024,
+  "low_vram": false,
+  "negative": "lowres, blurry, jpeg artifacts, watermark, signature, text, extra fingers, deformed hands, bad anatomy, extra limbs, oversaturated, cartoon, cgi, plastic skin",
+  "images": [
+    {
+      "file": "rime_snow_forest.png",
+      "seed": 731905,
+      "prompt": "Photorealistic rime ice forest at sunrise, every birch branch coated in thick white hoarfrost, untouched deep snow, blue mist between trunks, warm golden light rays, sparkling frost crystals, ultra detailed, 35mm photo"
+    },
+    {
+      "file": "cute_boy_winter.png",
+      "seed": 418273,
+      "prompt": "Candid portrait photo of a cheerful 12 year old boy, short black hair, bright curious eyes, warm smile, navy winter parka and knitted scarf, light snow falling, soft daylight, 85mm lens, shallow depth of field, natural skin texture, photorealistic"
+    }
+  ]
+}

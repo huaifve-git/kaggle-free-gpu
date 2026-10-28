@@ -49,7 +49,8 @@ GPU、联网、数据源挂载都是一等公民参数。
 
 - **RVC 笔记本模板**（`kaggle-mcp/src/rvc-templates.mjs`）—— 把 RVC 训练 / 推理流水线做成一键填入的单元格，
   上游仓库里那些"报错不明显、但一定会让训练失败"的坑全部提前处理掉；
-- **两套技能（Skill）** —— 训练与推理的标准流程，AI 助手可直接调用。
+- **四个现成场景（`skills/`）** —— RVC 训练、RVC 推理、在 Kaggle 上部署 OpenAI 兼容 LLM API、SDXL 出图，
+  每个都是一份 `SKILL.md` + 可复用脚本，AI 助手可直接调用。
 
 也就是说，你不需要懂 RVC 的目录结构和参数顺序，只要提供音频，剩下的事情模板会做完。
 
@@ -63,6 +64,7 @@ GPU、联网、数据源挂载都是一等公民参数。
 | **跨 Notebook 传文件** | 推理时可直接把"训练 Kernel 的输出"挂载为数据源，文件无需下载再上传 |
 | **训练音色模型**（RVC 场景） | 上传一段人声 → 在 Kaggle GPU 上跑完整训练 → 拿回 `.pth` 模型 + FAISS 索引 |
 | **声音转换（推理）**（RVC 场景） | 用训练好的模型把任意音频换成目标音色，输出 WAV |
+| **文生图**（SDXL 场景） | 一份 jobs JSON → Kaggle T4 上跑 SDXL → 拿回 PNG + 参数留档（含种子，可复现） |
 
 ## 工作原理
 
@@ -300,7 +302,7 @@ kaggle-free-gpu/
 │   └── test/                  冒烟、协议、端到端测试
 ├── kernels/<slug>/            本地生成的 Kernel（.ipynb + 元数据）
 ├── outputs/<owner>__<slug>/   从 Kaggle 下载的产物 + 运行日志
-├── skills/                    DSH 技能：RVC 训练/推理 + Kaggle 公网 LLM API 部署的标准流程
+├── skills/                    DSH 技能：RVC 训练/推理、Kaggle 公网 LLM API 部署、SDXL 出图的标准流程
 └── .secrets/                  本地凭据兜底（Git 忽略）
 ```
 
@@ -362,6 +364,7 @@ kaggle-free-gpu/
 | [skills/rvc-train-on-kaggle/SKILL.md](skills/rvc-train-on-kaggle/SKILL.md) | 训练流程：额度检查、工具顺序、产物验证、失败排查 |
 | [skills/rvc-inference-on-kaggle/SKILL.md](skills/rvc-inference-on-kaggle/SKILL.md) | 推理流程：模型挂载方式、参数说明、常见故障 |
 | [skills/serve-llm-api-on-kaggle/SKILL.md](skills/serve-llm-api-on-kaggle/SKILL.md) | 部署流程：GGUF 选型、llama.cpp + Cloudflare 隧道暴露公网 api/v1、URL 回传与保活 |
+| [skills/kaggle-sdxl-imagegen/SKILL.md](skills/kaggle-sdxl-imagegen/SKILL.md) | 出图流程：jobs JSON 建模、CLIP 77 token 上限、diffusers 1.x 兼容、种子留档与验收 |
 
 ## 致谢与许可
 
